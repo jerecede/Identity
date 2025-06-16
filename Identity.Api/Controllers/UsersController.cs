@@ -31,7 +31,7 @@ namespace Identity.Api.Controllers
             _logger.LogInformation("Fetching all users from the database.");
 
             var users = await _usersService.GetAllUsers();
-            return Ok(users);
+            return Ok(users); //anche se vuoto restituisco
         }
 
         // GET: api/Users/5
@@ -49,6 +49,23 @@ namespace Identity.Api.Controllers
 
             _logger.LogInformation($"User with ID: {id} found successfully.");
             return Ok(user);
+        }
+
+        // GET: api/Users/5/roles
+        [HttpGet("{id}/roles")]
+        public async Task<IActionResult> GetUserRoles([FromRoute] int id)
+        {
+            _logger.LogInformation($"Fetching roles from user with ID: {id} from the database.");
+            var roles = await _usersService.GetRolesFromId(id);
+
+            if (roles == null)
+            {
+                _logger.LogWarning($"User with ID: {id} not found");
+                return NotFound();
+            }
+
+            _logger.LogInformation($"User with ID: {id} found successfully, returning roles.");
+            return Ok(roles);
         }
 
         // PUT: api/Users/5

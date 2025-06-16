@@ -38,6 +38,7 @@ namespace Identity.Api
             builder.Services.AddControllers();
             builder.Services.AddScoped<IUsersService, JereUsersService>();
             builder.Services.AddScoped<IRequestService, JereRequestService>();
+            builder.Services.AddScoped<IRoleService, JereRoleService>();
 
             var app = builder.Build();
 

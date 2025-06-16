@@ -14,7 +14,7 @@ namespace Identity.Api.Services.Models
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public ICollection<Request> Requests { get; set; } = new List<Request>();
-        public ICollection<Role> Roles { get; set; } = new List<Role>();
+        public virtual ICollection<Request> Requests { get; set; }
+        public virtual ICollection<UserRole> UserRoles { get; set; }
     }
 }

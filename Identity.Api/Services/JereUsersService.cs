@@ -1,4 +1,5 @@
 ﻿using Identity.Api.Models.DTOs;
+using Identity.Api.Models.ViewModel;
 using Identity.Api.Models.Views;
 using Identity.Api.Services.Interfaces;
 using Identity.Api.Services.Models;
@@ -45,6 +46,40 @@ namespace Identity.Api.Services
                 Password = user.Password
             };
             return userView;
+        }
+
+        public async Task<IEnumerable<RoleViewModel>?> GetRolesFromId(int id)
+        {
+            var user = await _context.Users //user con tutto il suo contesto (userRoles, roles
+                .Include(u => u.UserRoles)
+                .ThenInclude(ur => ur.Role)
+                .FirstOrDefaultAsync(u => u.Id == id);
+
+            if (user == null) return null;
+
+            var roles = user.UserRoles.Select(ur => new RoleViewModel
+            {
+                Id = ur.Role.Id,
+                Name = ur.Role.Name
+            }).ToList();
+
+            //var user = await _context.Users.FindAsync(id);
+
+            //var userRoles = await _context.UserRoles
+            //    .Where(ur => ur.UserId == user.Id)
+            //    .Select(ur => ur.Role)
+            //    .ToListAsync();
+
+            //var roles = await _context.Roles
+            //    .Where(role => userRoles.Any(ur => ur.Id == role.Id))
+            //    .Select(role => new RoleViewModel
+            //    {
+            //        Id = role.Id,
+            //        Name = role.Name
+            //    })
+            //    .ToListAsync();
+
+            return roles;
         }
 
         public async Task<bool> UpdateUser(int id, UserUpdateDTO rawUser)

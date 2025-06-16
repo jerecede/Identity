@@ -52,6 +52,7 @@ namespace Identity.Api.Services
             if (request == null) return false;
 
             if(!string.IsNullOrWhiteSpace(rawRequest.Text) && rawRequest.Text.Length <= 500) request.Text = rawRequest.Text;
+            //me ne frego se c'è invalid data, semplicemente non lo aggiorno
 
             _context.Entry(request).State = EntityState.Modified;
             await _context.SaveChangesAsync();
@@ -81,6 +82,8 @@ namespace Identity.Api.Services
         {
             var request = await _context.Requests.FindAsync(id);
             if (request == null) return null;
+
+            //c'è gia cascade quindi non mi faccio problemi con le foreign key
 
             _context.Requests.Remove(request);
             await _context.SaveChangesAsync();

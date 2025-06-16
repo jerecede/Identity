@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 
 namespace Identity.Api.Services.Models
 {
-    public class IdentityContext: DbContext
+    public class IdentityContext : DbContext
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Request> Requests { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         public IdentityContext()
         {
@@ -65,11 +67,34 @@ namespace Identity.Api.Services.Models
                 entity.Property(r => r.Name).IsRequired().HasMaxLength(50).HasColumnName("name");
             });
 
-            modelBuilder.Entity<User>()
-                .HasMany(u => u.Roles)
-                .WithMany(r => r.Users)
-                .UsingEntity(ur => ur.ToTable("user_roles"));
+            //modelBuilder.Entity<User>()
+            //    .HasMany(u => u.Roles)
+            //    .WithMany(r => r.Users)
+            //    .UsingEntity(ur => ur.ToTable("user_roles")); //AUTOMATICO NON MI PIACE
 
+
+            modelBuilder.Entity<UserRole>(entity =>
+            {
+                entity.ToTable("user_roles");
+
+
+                entity.Property(ur => ur.UserId).HasColumnName("user_id");
+                entity.Property(ur => ur.RoleId).HasColumnName("role_id");
+
+                entity.HasOne(ur => ur.User)
+                      .WithMany(u => u.UserRoles)
+                      .HasForeignKey(ur => ur.UserId)
+                      .HasConstraintName("userrole_user_fkey")
+                      .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(ur => ur.Role)
+                      .WithMany(r => r.UserRoles)
+                      .HasForeignKey(ur => ur.RoleId)
+                      .HasConstraintName("userrole_role_fkey")
+                      .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasKey(ur => new { ur.UserId, ur.RoleId })
+                      .HasName("userroles_pkey");
+            });
         }
     }
 }

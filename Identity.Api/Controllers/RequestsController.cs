@@ -32,7 +32,7 @@ namespace Identity.Api.Controllers
             _logger.LogInformation("Fetching all requests from the database.");
 
             var requests = await _requestsService.GetAllRequests();
-            return Ok(requests);
+            return Ok(requests); //anche se vuoto restituisco
         }
 
         // GET: api/Requests/5
@@ -82,6 +82,12 @@ namespace Identity.Api.Controllers
             {
                 _logger.LogWarning("FAILED creation Request: invalid data.");
                 return BadRequest("Invalid request data provided.");
+            }
+
+            if (requestId == -1)
+            {
+                _logger.LogWarning($"FAILED creation Request: User with ID {request.UserId} not found.");
+                return NotFound($"User with ID {request.UserId} not found.");
             }
 
             _logger.LogInformation($"SUCCESS creating Request with ID: {requestId}.");

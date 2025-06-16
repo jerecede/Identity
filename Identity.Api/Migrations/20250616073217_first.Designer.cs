@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Identity.Api.Migrations
 {
     [DbContext(typeof(IdentityContext))]
-    [Migration("20250613100952_second")]
-    partial class second
+    [Migration("20250616073217_first")]
+    partial class first
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -55,7 +55,46 @@ namespace Identity.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Requests");
+                    b.ToTable("requests", (string)null);
+                });
+
+            modelBuilder.Entity("Identity.Api.Models.Role", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id")
+                        .HasName("roles_pkey");
+
+                    b.ToTable("roles", (string)null);
+                });
+
+            modelBuilder.Entity("Identity.Api.Models.UserRole", b =>
+                {
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer")
+                        .HasColumnName("role_id");
+
+                    b.HasKey("UserId", "RoleId")
+                        .HasName("userroles_pkey");
+
+                    b.HasIndex("RoleId");
+
+                    b.ToTable("user_roles", (string)null);
                 });
 
             modelBuilder.Entity("Identity.Api.Services.Models.User", b =>
@@ -94,7 +133,7 @@ namespace Identity.Api.Migrations
                     b.HasKey("Id")
                         .HasName("users_pkey");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Identity.Api.Models.Request", b =>
@@ -109,9 +148,37 @@ namespace Identity.Api.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Identity.Api.Models.UserRole", b =>
+                {
+                    b.HasOne("Identity.Api.Models.Role", "Role")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("userrole_role_fkey");
+
+                    b.HasOne("Identity.Api.Services.Models.User", "User")
+                        .WithMany("UserRoles")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("userrole_user_fkey");
+
+                    b.Navigation("Role");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Identity.Api.Models.Role", b =>
+                {
+                    b.Navigation("UserRoles");
+                });
+
             modelBuilder.Entity("Identity.Api.Services.Models.User", b =>
                 {
                     b.Navigation("Requests");
+
+                    b.Navigation("UserRoles");
                 });
 #pragma warning restore 612, 618
         }
